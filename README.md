@@ -48,6 +48,12 @@ Após coletar os tweets é preciso gerar os dados processados. Para isto execute
 
 Para executar o servidor web com a página, use: `python flask_app.py` no diretório raiz.
 
+**Para executar os arquivos utilize os seguintes comandos na pasta raiz do projeto:** 
+
+`python -m db.files.update_dataset`: para coletar os dados e inserir no banco de dados. 
+
+`python -m scripts.run`: para processar os dados e inseri-los processados nas tabelas correspondentes. 
+
 A página a seguir deve ser visualizada:
 
 ![screen_capture](http://adolfo.data2learning.com/screen_capture_d2l.png)
