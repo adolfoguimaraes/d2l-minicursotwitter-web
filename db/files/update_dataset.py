@@ -21,7 +21,6 @@ from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 
 parent_dir_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-#sys.path.append(parent_dir_name)
 from db.models import AllTweets
 from db.database import db_session
 

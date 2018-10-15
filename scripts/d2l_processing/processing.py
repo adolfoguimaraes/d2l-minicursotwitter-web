@@ -29,9 +29,21 @@ class Processing():
         all_tokens = []
 
         for text in list_text:
-            text = text.lower()
 
-            local_patterns = regexp_tokenize(text, self.pattern)
+
+            tweet = str(text, 'utf-8')
+
+            try:
+                tweet = normalize('NFKD', tweet.lower()).encode('ASCII', 'ignore')
+            except UnicodeEncodeError:
+                tweet = normalize('NFKD', tweet.lower().decode('utf-8')).encode('ASCII', 'ignore')
+
+            if isinstance(tweet, str) == False:
+                tweet = tweet.decode('utf-8')
+
+            
+
+            local_patterns = regexp_tokenize(tweet, self.pattern)
 
             patterns += local_patterns
 
@@ -113,6 +125,11 @@ class Processing():
         frequence_users_cited = nltk.FreqDist(self.users_cited)
 
         return frequence_users_cited.most_common(limit)
+
+    def get_frequence_users_rt(self, list_user_rt, limit=50):
+        frequence_users_rt = nltk.FreqDist(list_user_rt)
+
+        return frequence_users_rt.most_common(limit)
 
     def get_frequence_hashtags(self, limit=50):
         frequence_hashtags = nltk.FreqDist(self.hashtags)

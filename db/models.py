@@ -11,20 +11,22 @@ class AllTweets(Base):
     user = Column(BIGINT)
     text = Column(Text)
     date = Column(DATETIME)
-    user_image = Column(Text)
+    rt_user = Column(Text)
+    query = Column(Text)
     context = Column(Text)
 
-    def __init__(self, tweet_id=None, user=None, text=None, date=None, user_image=None, context=None):
+    def __init__(self, tweet_id=None, user=None, text=None, date=None, rt_user=None, query=None, context=None):
         self.tweet_id = tweet_id
         self.user = user
         self.text = text
         self.date = date
-        self.user_image = user_image
+        self.rt_user = rt_user
         self.context = context
+        self.query = query
 
 
-class Usuarios(Base):
-    __tablename__ = 'usuarios'
+class UsuariosRT(Base):
+    __tablename__ = 'usuarios_rt'
     id = Column(Integer, primary_key=True,autoincrement=True)
     usuario = Column(Text, unique=True)
     frequencia = Column(Integer, unique=False)

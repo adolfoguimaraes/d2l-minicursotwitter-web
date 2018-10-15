@@ -1,1 +1,3 @@
 db/files/database_complete.db
+.vscode
+__pycache__*

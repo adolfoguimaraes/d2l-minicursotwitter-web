@@ -4,7 +4,7 @@ var margin = {top: 30, right: 20, bottom: 30, left: 50},
     height = 300 - margin.top - margin.bottom;
 
 // Parse the date / time
-var parseDate = d3.time.format("%Y-%m-%d").parse;
+var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
 
 // Set the ranges
 var x = d3.time.scale().range([0, width]);
@@ -34,7 +34,9 @@ var svg = d3.select("#graph")
 // Get the data
 d3.json("/graph/", function(error, data) {
     data['list'].forEach(function(d) {
-		d.date = parseDate(d.date);
+        
+        d.date = parseDate(d.date);
+        
 		d.count = +d.count;
     });
 
