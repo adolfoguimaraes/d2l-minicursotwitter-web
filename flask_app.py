@@ -62,7 +62,7 @@ def home():
     total_texts = db_session.query(func.count(AllTweets.id).label('total_texts')).filter(AllTweets.context.is_(CONTEXT)).first().total_texts
 
     if total_texts == 0:
-        return("There is no data for this context: " + CONTEXT)
+        return render_template("out.html")
 
     total_terms = db_session.query(func.count(Termos.id).label('total_terms')).filter(Termos.context.is_(CONTEXT)).first().total_terms
     total_processed = db_session.query(func.count(AllTweets.id).label("total_processed")).filter(AllTweets.context.is_(CONTEXT)).filter(AllTweets.processed==1).first().total_processed
