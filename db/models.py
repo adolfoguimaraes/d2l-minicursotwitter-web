@@ -14,8 +14,9 @@ class AllTweets(Base):
     rt_user = Column(Text)
     query = Column(Text)
     context = Column(Text)
+    processed = Column(BIGINT)
 
-    def __init__(self, tweet_id=None, user=None, text=None, date=None, rt_user=None, query=None, context=None):
+    def __init__(self, tweet_id=None, user=None, text=None, date=None, rt_user=None, query=None, context=None, processed=0):
         self.tweet_id = tweet_id
         self.user = user
         self.text = text
@@ -23,6 +24,7 @@ class AllTweets(Base):
         self.rt_user = rt_user
         self.context = context
         self.query = query
+        self.processed = processed
 
 
 class UsuariosRT(Base):

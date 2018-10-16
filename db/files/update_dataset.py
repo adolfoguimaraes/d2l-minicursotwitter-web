@@ -24,17 +24,20 @@ parent_dir_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 from db.models import AllTweets
 from db.database import db_session
 
-# Access app.twitter.com and generate own credentials account.
-#Definição das chaves da API do Twitter
-consumer_key = None # Get Keys and Access Token at apps.twitter.com
-consumer_secret = None # Get Keys and Access Token at apps.twitter.com
-access_token = None # Get Keys and Access Token at apps.twitter.com
-access_token_secret = None # Get Keys and Access Token at apps.twitter.com
+from scripts.d2l_collector.twitter import Twitter
 
-tw = Twython(consumer_key, consumer_secret, access_token, access_token_secret)
+
+t = Twitter()
+credentials = t.get_credentials()
+
+
+tw = Twython(credentials['consumer_key'], credentials['consumer_secret'], credentials['access_token'], credentials['access_token_secret'])
 
 result = []
 count = 0
+
+context = "bvs"
+tag = "#teambatman OR #teamsuperman"
 
 with open(parent_dir_name + '/files/tweets_ids.csv', 'rt', encoding="utf-8") as csv_file:
     reader = csv.DictReader(csv_file)
@@ -47,24 +50,12 @@ with open(parent_dir_name + '/files/tweets_ids.csv', 'rt', encoding="utf-8") as 
         try:
             tweet = tw.show_status(id=tweet_id)
 
-            t_id = tweet['id']
-            t_user = tweet['user']['screen_name']
+            tweet_processed = t.get_tweet_data(tweet)
 
-            if 'retweeted_status' in tweet.keys():
-                t_text = tweet['retweeted_status']['text']
-            else:
-                t_text = tweet['text']
-
-            t_date = tweet['created_at']
-            t_user_image = tweet['user']['profile_image_url']
-            t_context = 'bvs'
-
-            fmt = '%Y-%m-%d %H:%M:%S.%f'
-            t_date = datetime.strptime(t_date, '%a %b %d %H:%M:%S +0000 %Y').replace(tzinfo=pytz.UTC)
-
-            tweet_instance = AllTweets(t_id, t_user, t_text, t_date, t_user_image, t_context)
+            tweet_instance = AllTweets(tweet_processed['object_id'], tweet_processed['user_name'], tweet_processed['text'], tweet_processed['date_formated'], tweet_processed['user_rt'], tag, context)
             db_session.add(tweet_instance)
             db_session.commit()
+
             count = count + 1
             print("\t " + str(count) + " tweets collected")
 

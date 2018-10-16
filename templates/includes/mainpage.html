@@ -1,33 +1,96 @@
 <div class="starter-template">
-    <!--<img src="{{ url_for('static', filename='img/bvs.png') }}" width="100%" /> -->
-    <br /><br />
+    <div class="alert alert-primary" style="background-color: #19334d; color: #ffffff; ">
+        <h2>Visualização de dados coletados</h2>
+        <h5>
+            <strong>Contexto:</strong> {{ values['context'] }}
+        </h5>
+        <div>
+            Os dados a seguir mostram a comparação dos termos <strong>{{ values['side_a']|upper }}</strong> e
+            <strong>{{ values['side_b']|upper }}</strong> em relação a quantidade de tweets coletados que citavam tais
+            termos.
+        </div>
+        <div>
+            <small>Os dados são processados exatamente como coletados. Não é realizado nenhum tipo de ajuste para
+                favorecer um dos termos selecionados.
+            </small>
+        </div>
+        <br />
+    </div>
+    <div class="alert alert-info" style="background-color: #d9e6f2; color: #19334d; ">
+        <h4>Estatística:</h4>
+        
+            <div><strong>Total de tweets coletados: </strong> {{ values['total_texts'] }}</div>
+            <div><strong>Total de tweets processados: </strong> {{ values['total_processed'] }}</div>
+            <div><strong>Total de termos extraídos: </strong> {{ values['total_terms'] }}</div>
+            <div><strong>Data do primeiro tweet coletado: </strong> {{ values['date_min']|datetime }}</div>
+            <div><strong>Data do último tweet coletado: </strong> {{ values['date_max']|datetime }}</div>
+            <div><small>A coleta não foi contínua. São coletados apenas alguns tweets por dia.</small></div>
+        
+    </div>
 
+
+
+
+
+    <div>
+        Distribuição referente a quantidade que cada termo é citado nos textos coletados.
+    </div>
     <div class="progress">
-        <div class="progress-bar progress-bar-danger progress-bar-striped active" style="width: {{ values['total'][0] }}%">
-            <strong>{{ values['side_a'] }}</strong>
+        <div class="progress-bar progress-bar-danger progress-bar-striped active" style="width: {{ values['total'][0] }}%; font-size: large;">
+            <strong>{{ values['side_a']|upper }} - {{ values['total'][0]|round }}% </strong>({{
+            values['total_value'][0] }})
             <span class="sr-only">{{ values['total'][0] }}% A</span>
         </div>
-        <div class="progress-bar progress-bar-striped active" style="width: {{ values['total'][1] }}%">
-            <strong>{{ values['side_b'] }}</strong>
+        <div class="progress-bar progress-bar-striped active" style="width: {{ values['total'][1] }}%; font-size: large;">
+            <strong>{{ values['side_b']|upper }} - {{ values['total'][1]|round }}% </strong>({{
+            values['total_value'][1] }})
             <span class="sr-only">{{ values['total'][1] }}% B</span>
         </div>
+    </div>
 
+
+    <div>
+        <h2>Word Cloud</h2>
+        <div>Os termos pesquisados foram excluídos da nuvem para melhor visualização dos demais termos.</div>
+        <br />
     </div>
     <div class="col-xs-12">
         <div id="loading"></div>
         <section id="cloud"></section>
     </div>
 
-    <br/>
+    <br />
 
-    <div class="col-xs-12" align="center">
-        <div style="font-size: 17px;">
+    <div>
+        <h2>Bigram/Trigram</h2>
+        <div>Associação mais frequentes dos termos 2 a 2 (bigram) e 3 a 3 (trigram).</div>
+    </div>
+
+    <br />
+
+    <div class="col-xs-12" style="text-align: center;">
+        <div style="font-size: 22px;">
+
             {% for bt in values['bigram_trigram'] %}
-            <span class="label label-default">{{ bt.text }}</span>
+            <span style="padding: 5px; background-color: #cccccc; color:#19334d; ">{{ bt.text }}</span>
+            {% if loop.index % 4 == 0 %}
+            <br /><br />
+            {% endif %}
+
             {% endfor %}
         </div>
-        <br /><br/>
+        <br /><br />
     </div>
+
+    <div>
+        <h2>Termos e Usuários Frequentes<br /></h2>
+        <div><strong>Top Hashtags:</strong> hashtags mais citadas nos textos.</div>
+        <div><strong>Usuários re-tweetados:</strong> os usuários que tiveram seus textos mais re-tweetados nos textos
+            coletados.</div>
+        <div><strong>Usuários mais citados:</strong> usuários mais citados nos textos coletados.</div>
+
+    </div>
+    <br />
 
     <div class="col-xs-4">
         <ul class="list-group">
@@ -72,6 +135,11 @@
             </li>
             {% endfor %}
         </ul>
+    </div>
+
+    <div>
+        <h2>Gráfico de evolução</h2>
+        <div>Evolução da citação dos termos ao longo do tempo de coleta.</div>
     </div>
 
     <div class="col-xs-12" align="center">

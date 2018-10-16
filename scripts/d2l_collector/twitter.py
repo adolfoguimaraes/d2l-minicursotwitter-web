@@ -1,17 +1,21 @@
-from datetime import datetime
-import pytz
+import configparser
 import time
+from datetime import datetime
+
+import pytz
 
 
 class Twitter():
 
     def __init__(self):
 
-        self.consumer_key = "EhjkX3eL1KN2pitOt4PRRDuuo" # Get Keys and Access Token at apps.twitter.com
-        self.consumer_secret = "MCfsfrFD2NFC7vCxYon41ukxOuCSAvauskmxIA4aCW7P9txKV1" # Get Keys and Access Token at apps.twitter.com
-        self.access_token = "736392442384154624-YjF2w3SVj4wXKV2qWYgQKQsHBDz1CSz" # Get Keys and Access Token at apps.twitter.com
-        self.access_token_secret = "hJiihk0r7efTOoCjCX0qbMW0zl298LumPpC69jAgvZubm" # Get Keys and Access Token at apps.twitter.com
+        config = configparser.ConfigParser()
+        config.read("config.ini")
 
+        self.consumer_key = config['TWITTER']['CONSUMER_KEY'] # Get Keys and Access Token at apps.twitter.com
+        self.consumer_secret = config['TWITTER']['CONSUMER_SECRET'] # Get Keys and Access Token at apps.twitter.com
+        self.access_token = config['TWITTER']['ACCESS_TOKEN'] # Get Keys and Access Token at apps.twitter.com
+        self.access_token_secret = config['TWITTER']['ACCESS_TOKEN_SECRET'] # Get Keys and Access Token at apps.twitter.com
 
         self.credentials = {
             'consumer_key': self.consumer_key,

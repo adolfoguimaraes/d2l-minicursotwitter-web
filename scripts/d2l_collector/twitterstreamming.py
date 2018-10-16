@@ -68,9 +68,7 @@ if __name__ == "__main__":
         tag = str(p[1])
         context = str(p[2])
         language = str(p[3])
-        
-
-
+    
     twitter = Twitter()
 
     credentials = twitter.get_credentials()

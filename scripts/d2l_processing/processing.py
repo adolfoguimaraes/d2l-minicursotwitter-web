@@ -1,61 +1,75 @@
 import nltk
 import pytz
 
-from unicodedata import normalize, category
+from nltk.collocations import BigramCollocationFinder, TrigramCollocationFinder
+from nltk.corpus import stopwords
+from nltk.metrics import BigramAssocMeasures, TrigramAssocMeasures
+from nltk.tokenize import regexp_tokenize
 
 from collections import Counter, Set
-
-from nltk.tokenize import regexp_tokenize
-from nltk.corpus import stopwords
-from nltk.collocations import BigramCollocationFinder, TrigramCollocationFinder
-from nltk.metrics import BigramAssocMeasures, TrigramAssocMeasures
+from unicodedata import category, normalize
 
 from scripts.d2l_utils.repeatreplacer import RepeatReplacer
 
+
 class Processing():
 
-    def __init__(self):
+    def __init__(self, stopwords_language=['portuguese']):
         self.pattern = r'(https://[^"\' ]+|www.[^"\' ]+|http://[^"\' ]+|\w+|\@\w+|\#\w+)'
-        self.portuguese_stops = stopwords.words(['portuguese'])
+        self.pattern_user = r'\@\w+'
+        self.pattern_links = r'(https://[^"\' ]+|www.[^"\' ]+|http://[^"\' ]+)'
+        self.pattern_hashtag = r'\#\w+'
+        self.pattern_words = r'\w+'
+
+        self.portuguese_stops = stopwords.words(stopwords_language)
 
         self.users_cited = []
         self.links_appears = []
         self.hashtags = []
 
+    def encode_text(self, text):
 
-    def get_words(self, list_text):
+        new_text = str(text, 'utf-8')
+
+        try:
+            tweet = normalize('NFKD', new_text.lower()).encode('ASCII', 'ignore')
+        except UnicodeEncodeError:
+            tweet = normalize('NFKD', new_text.lower().decode('utf-8')).encode('ASCII', 'ignore')
+
+        if isinstance(new_text, str) == False:
+            new_text = new_text.decode('utf-8')
+
+        return new_text
+
+    def get_words(self, list_text, side_tuple):
 
         patterns = []
         all_tokens = []
+        all_tokens_date = []
 
         for text in list_text:
 
-
-            tweet = str(text, 'utf-8')
-
-            try:
-                tweet = normalize('NFKD', tweet.lower()).encode('ASCII', 'ignore')
-            except UnicodeEncodeError:
-                tweet = normalize('NFKD', tweet.lower().decode('utf-8')).encode('ASCII', 'ignore')
-
-            if isinstance(tweet, str) == False:
-                tweet = tweet.decode('utf-8')
-
+            tweet_text = self.encode_text(text[0]).lower()
+            
+            local_patterns = regexp_tokenize(tweet_text, self.pattern)
+            users = regexp_tokenize(tweet_text, self.pattern_user)
+            links = regexp_tokenize(tweet_text, self.pattern_links)
+            hashtags = regexp_tokenize(tweet_text, self.pattern_hashtag)
             
 
-            local_patterns = regexp_tokenize(tweet, self.pattern)
+            self.users_cited += users
+            self.links_appears += links
+            self.hashtags += hashtags
 
-            patterns += local_patterns
+            tokens_date = [e for e in local_patterns if e == side_tuple[0] or e == side_tuple[1]]
 
-            self.users_cited += [e for e in local_patterns if e[0] == '@']
-            self.links_appears += [e for e in local_patterns if e[:4] == 'http']
-            self.hashtags += [e for e in local_patterns if e[0] == '#']
+            if len(tokens_date) > 0:
+                all_tokens_date.append((tokens_date, text[1]))
 
 
-            final_tokens = [e for e in local_patterns if e[:4] != 'http']
-            final_tokens = [e for e in final_tokens if e[:4] != 'www.']
-            final_tokens = [e for e in final_tokens if e[0] != '#']
-            final_tokens = [e for e in final_tokens if e[0] != '@']
+            final_tokens = [e for e in local_patterns if e not in links]
+            final_tokens = [e for e in final_tokens if e not in hashtags]
+            final_tokens = [e for e in final_tokens if e not in users]
 
             all_tokens += final_tokens
 
@@ -63,7 +77,7 @@ class Processing():
 
         word_set = set(words)
 
-        return words, word_set
+        return words, word_set, all_tokens_date
 
 
     def correct_text(self, word_set):
@@ -72,17 +86,15 @@ class Processing():
 
         map_words = {}
 
-
         for word in word_set:
             new_word = replacer_repeat.replace(word)
-
             map_words[word] = new_word
 
         return map_words
 
-    def get_final_words(self, list_text, correct=True):
+    def get_final_words(self, list_text, correct=True, side_tuple=None):
 
-        words, word_set = self.get_words(list_text)
+        words, word_set, all_tokens_date = self.get_words(list_text, side_tuple)
 
         if correct:
             map_words = self.correct_text(word_set)
@@ -90,20 +102,9 @@ class Processing():
         else:
             words_temp = words
 
-        words_temp = [word for word in words_temp if len(word) >= 3]
+        final_words = [word for word in words_temp if len(word) >= 3]
 
-        final_words = []
-
-        for word in words_temp:
-            try:
-                new_word = normalize('NFKD', word.lower()).encode('ASCII', 'ignore')
-            except UnicodeEncodeError:
-                new_word = normalize('NFKD', word.lower().decode('utf-8')).encode('ASCII', 'ignore')
-
-            final_words.append(new_word.decode("utf-8") )
-
-
-        return final_words
+        return final_words, all_tokens_date
 
     def get_frequence_terms(self, final_words, limit=None):
 

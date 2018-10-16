@@ -1,3 +1,4 @@
-db/files/database_complete.db
+db/files/database.db
 .vscode
 __pycache__*
+.DS_Store*

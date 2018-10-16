@@ -1,13 +1,42 @@
 from flask import Flask, jsonify, render_template
 from db.database import db_session
-from db.models import UsuariosRT, Termos, Hashtags, HashtagsGraph, UsuariosCitados, BigramTrigram
+from db.models import UsuariosRT, Termos, Hashtags, HashtagsGraph, UsuariosCitados, BigramTrigram, AllTweets
+from sqlalchemy.sql.functions import func
+import pytz
+import datetime
+import calendar
+import configparser
 
 app = Flask(__name__)
 
-SIDE_A = "haddad"
-SIDE_B = "bolsonaro"
-CONTEXT = "eleicoes2018"
-HAHSTAG = False
+
+config = configparser.ConfigParser()
+config.read("scripts/config.ini")
+
+SIDE_A = config['GENERAL']['SIDE_A']
+SIDE_B = config['GENERAL']['SIDE_B']
+CONTEXT = config['GENERAL']['CONTEXT']
+HAHSTAG = bool(config['GENERAL']['HASHTAG'])
+
+def change_fuso(value):
+
+    fuso_horario = pytz.timezone("America/Sao_Paulo")
+    date_ = value.replace(tzinfo=pytz.utc)
+    date_ = date_.astimezone(fuso_horario)
+    str_time = date_.strftime("%Y-%m-%d %H:%M:%S")
+
+    return str_time
+
+def format_datetime(value):
+
+    fuso_horario = pytz.timezone("America/Sao_Paulo")
+    date_ = value.replace(tzinfo=pytz.utc)
+    date_ = date_.astimezone(fuso_horario)
+    str_time = date_.strftime("%d/%m/%y %H:%M:%S")
+
+    return str_time
+
+app.jinja_env.filters['datetime'] = format_datetime
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
@@ -21,12 +50,20 @@ def load_from_db(limit=10):
     query_hashtags = Hashtags.query.order_by(Hashtags.frequencia.desc()).limit(limit).all()
     query_usuarios_citados = UsuariosCitados.query.order_by(UsuariosCitados.frequencia.desc()).limit(limit).all()
 
-    query_bigram_trigram = BigramTrigram.query.all()
+    query_bigram_trigram = BigramTrigram.query.order_by(BigramTrigram.tipo.desc()).limit(limit).all()
 
     return query_termos, query_hashtags, query_usuarios_rt, query_usuarios_citados, query_bigram_trigram
 
 @app.route("/")
 def home():
+
+    total_texts = db_session.query(func.count(AllTweets.id).label('total_texts')).first().total_texts
+    total_terms = db_session.query(func.count(Termos.id).label('total_terms')).first().total_terms
+    total_processed = db_session.query(func.count(AllTweets.id).label("total_processed")).filter(AllTweets.processed==1).first().total_processed
+    
+
+    date_max = db_session.query(AllTweets.id, func.max(AllTweets.date).label('last_date')).first().last_date
+    date_min = db_session.query(AllTweets.id, func.min(AllTweets.date).label('last_date')).first().last_date
 
     termos, hashtags, usuarios_rt, usuarios_citados, bigram_trigram = load_from_db(10)
 
@@ -53,6 +90,11 @@ def home():
         percent_b = (total_b / total) * 100
 
     dict_values = {
+        'total_texts': total_texts,
+        'total_terms': total_terms,
+        'total_processed': total_processed,
+        'date_max': date_max,
+        'date_min': date_min,
         'side_a': SIDE_A,
         'side_b': SIDE_B,
         'termos': termos,
@@ -60,7 +102,8 @@ def home():
         'usuarios_rt': usuarios_rt,
         'usuarios_citados': usuarios_citados,
         'total': (percent_a, percent_b),
-        'bigram_trigam': bigram_trigram,
+        'total_value': (int(total_a), int(total_b)),
+        'bigram_trigram': bigram_trigram,
         'context': CONTEXT
 
     }
@@ -74,9 +117,16 @@ def graph():
 
     query_hashtag = HashtagsGraph.query.filter_by(context=CONTEXT).all()
     all_ = []
+
+    fuso_horario = pytz.timezone("America/Sao_Paulo")
+
     for q in query_hashtag:
-        date_ = str(q.date)
-        print(date_)
+
+        
+        date_ = change_fuso(q.date)
+
+        
+        
         t = {}
         t['date'] = date_
         t['count'] = q.frequencia
