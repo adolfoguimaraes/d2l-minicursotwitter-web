@@ -74,12 +74,11 @@ def home():
     termos, hashtags, usuarios_rt, usuarios_citados, bigram_trigram = load_from_db(10)
 
     if HASHTAG == "True":
-        print("Aqui")
         query_a = Hashtags.query.filter(and_(Hashtags.hashtag.is_(SIDE_A),Hashtags.context.is_(CONTEXT))).first()
         query_b = Hashtags.query.filter(and_(Hashtags.hashtag.is_(SIDE_B),Hashtags.context.is_(CONTEXT))).first()
     else:
         query_a = Termos.query.filter(and_(Termos.termo.is_(SIDE_A),Termos.context.is_(CONTEXT))).first()
-        query_b = Termos.query.filter(and_(Termos.termo.is_(SIDE_A),Termos.context.is_(CONTEXT))).first()
+        query_b = Termos.query.filter(and_(Termos.termo.is_(SIDE_B),Termos.context.is_(CONTEXT))).first()
 
     total_a = 0
     total_b = 0
