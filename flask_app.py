@@ -7,8 +7,10 @@ import datetime
 import calendar
 import configparser
 
-app = Flask(__name__)
+from sqlalchemy import and_
 
+app = Flask(__name__)
+ 
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -16,7 +18,7 @@ config.read("config.ini")
 SIDE_A = config['GENERAL']['SIDE_A']
 SIDE_B = config['GENERAL']['SIDE_B']
 CONTEXT = config['GENERAL']['CONTEXT']
-HAHSTAG = bool(config['GENERAL']['HASHTAG'])
+HASHTAG = config['GENERAL']['HASHTAG']
 
 def change_fuso(value):
 
@@ -71,12 +73,13 @@ def home():
 
     termos, hashtags, usuarios_rt, usuarios_citados, bigram_trigram = load_from_db(10)
 
-    if HAHSTAG:
-        query_a = Hashtags.query.filter_by(hashtag=SIDE_A).first()
-        query_b = Hashtags.query.filter_by(hashtag=SIDE_B).first()
+    if HASHTAG == "True":
+        print("Aqui")
+        query_a = Hashtags.query.filter(and_(Hashtags.hashtag.is_(SIDE_A),Hashtags.context.is_(CONTEXT))).first()
+        query_b = Hashtags.query.filter(and_(Hashtags.hashtag.is_(SIDE_B),Hashtags.context.is_(CONTEXT))).first()
     else:
-        query_a = Termos.query.filter_by(termo=SIDE_A).first()
-        query_b = Termos.query.filter_by(termo=SIDE_B).first()
+        query_a = Termos.query.filter(and_(Termos.termo.is_(SIDE_A),Termos.context.is_(CONTEXT))).first()
+        query_b = Termos.query.filter(and_(Termos.termo.is_(SIDE_A),Termos.context.is_(CONTEXT))).first()
 
     total_a = 0
     total_b = 0
