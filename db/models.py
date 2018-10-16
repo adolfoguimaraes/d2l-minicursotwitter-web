@@ -32,10 +32,12 @@ class UsuariosRT(Base):
     id = Column(Integer, primary_key=True,autoincrement=True)
     usuario = Column(Text, unique=True)
     frequencia = Column(Integer, unique=False)
+    context = Column(Text)
 
-    def __init__(self, usuario=None, frequencia=None):
+    def __init__(self, usuario=None, frequencia=None, context=None):
         self.usuario = usuario
         self.frequencia = frequencia
+        self.context = context
 
     def __repr__(self):
         return '<Usuario %r>' % (self.usuario)
@@ -46,10 +48,12 @@ class Termos(Base):
     id = Column(Integer, primary_key=True,autoincrement=True)
     termo = Column(Text, unique=True)
     frequencia = Column(Integer, unique=False)
+    context = Column(Text)
 
-    def __init__(self, termo=None, frequencia=None):
+    def __init__(self, termo=None, frequencia=None, context=None):
         self.termo = termo
         self.frequencia = frequencia
+        self.context = context
 
     def __repr__(self):
         return '<Termo %r>' % (self.termo)
@@ -60,10 +64,12 @@ class UsuariosCitados(Base):
     id = Column(Integer, primary_key=True,autoincrement=True)
     usuario = Column(Text, unique=True)
     frequencia = Column(Integer, unique=False)
+    context = Column(Text)
 
-    def __init__(self, usuario=None, frequencia=None):
+    def __init__(self, usuario=None, frequencia=None, context=None):
         self.usuario = usuario
         self.frequencia = frequencia
+        self.context = context
 
     def __repr__(self):
         return '<Usuario %r>' % (self.usuario)
@@ -93,10 +99,12 @@ class Hashtags(Base):
     id = Column(Integer, primary_key=True,autoincrement=True)
     hashtag = Column(Text, unique=True)
     frequencia = Column(Integer, unique=False)
+    context = Column(Text)
 
-    def __init__(self, hashtag=None, frequencia=None):
+    def __init__(self, hashtag=None, frequencia=None, context=None):
         self.hashtag = hashtag
         self.frequencia = frequencia
+        self.context = context
 
     def __repr__(self):
         return '<Hashtag %r>' % (self.hashtag)
@@ -107,11 +115,13 @@ class BigramTrigram(Base):
 
     id = Column(Integer, primary_key=True,autoincrement=True)
     text = Column(Text)
-    tipo = Column(Integer)
+    frequencia = Column(Integer)
+    context = Column(Text)
 
-    def __init__(self, text=None, tipo=None):
+    def __init__(self, text=None, frequencia=None, context=None):
         self.text = text
-        self.tipo = tipo
+        self.frequencia = frequencia
+        self.context = context
 
     def __repr__(self):
         return '<BigramTrigram %r>' % (self.text)

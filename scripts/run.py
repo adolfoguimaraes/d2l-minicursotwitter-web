@@ -80,10 +80,10 @@ def populate_database(context, side_tuple, bigrams, frequency_hashtags, frequenc
     
     for t in frequency_terms:
 
-        obj = db_session.query(Termos).filter(Termos.termo == t[0]).first()
+        obj = db_session.query(Termos).filter(and_(Termos.termo.is_(t[0]),Termos.context.is_(context))).first()
 
         if obj == None:
-	        termo = Termos(t[0], t[1])
+	        termo = Termos(t[0], t[1], context)
 	        db_session.add(termo)
         else:
 	        obj.frequencia = obj.frequencia + t[1]
@@ -92,10 +92,10 @@ def populate_database(context, side_tuple, bigrams, frequency_hashtags, frequenc
     
     for t in frequency_users_rt:
 
-        obj = db_session.query(UsuariosRT).filter(UsuariosRT.usuario == t[0]).first()
+        obj = db_session.query(UsuariosRT).filter(and_(UsuariosRT.usuario.is_(t[0]),UsuariosRT.context.is_(context))).first()
 
         if obj == None:
-            new_ = UsuariosRT(t[0], t[1])
+            new_ = UsuariosRT(t[0], t[1], context)
             db_session.add(new_)
         else:
             obj.frequencia = obj.frequencia + t[1]
@@ -104,10 +104,10 @@ def populate_database(context, side_tuple, bigrams, frequency_hashtags, frequenc
     
     for t in frequency_users_cited:
 
-        obj = db_session.query(UsuariosCitados).filter(UsuariosCitados.usuario == t[0]).first()
+        obj = db_session.query(UsuariosCitados).filter(and_(UsuariosCitados.usuario.is_(t[0]),UsuariosCitados.context.is_(context))).first()
         
         if obj == None:
-            new_ = UsuariosCitados(t[0], t[1])
+            new_ = UsuariosCitados(t[0], t[1], context)
             db_session.add(new_)
         else:
             obj.frequencia = obj.frequencia + t[1]
@@ -116,10 +116,10 @@ def populate_database(context, side_tuple, bigrams, frequency_hashtags, frequenc
     
     for t in frequency_hashtags:
 
-        obj = db_session.query(Hashtags).filter(Hashtags.hashtag == t[0]).first()
+        obj = db_session.query(Hashtags).filter(and_(Hashtags.hashtag.is_(t[0]), Hashtags.context.is_(context))).first()
 
         if obj == None:
-            new_ = Hashtags(t[0], t[1])
+            new_ = Hashtags(t[0], t[1], context)
             db_session.add(new_)
         else:
             obj.frequencia = obj.frequencia + t[1]
@@ -129,26 +129,26 @@ def populate_database(context, side_tuple, bigrams, frequency_hashtags, frequenc
     for bigram in bigrams:
         text = ' '.join(word for word in bigram)
         
-        obj = db_session.query(BigramTrigram).filter(BigramTrigram.text == text).first()
+        obj = db_session.query(BigramTrigram).filter(and_(BigramTrigram.text.is_(text), BigramTrigram.context.is_(context))).first()
 
         if obj == None:
-            new_ = BigramTrigram(text, 1)
+            new_ = BigramTrigram(text, 1, context)
             db_session.add(new_)
         else:
-            obj.tipo = obj.tipo + 1
+            obj.frequencia = obj.frequencia + 1
     
     db_session.commit()
     
     for trigram in trigrams:
         text = ' '.join(word for word in trigram)
 
-        obj = db_session.query(BigramTrigram).filter(BigramTrigram.text == text).first()
+        obj = db_session.query(BigramTrigram).filter(and_(BigramTrigram.text.is_(text), BigramTrigram.context.is_(context))).first()
 
         if obj == None:
-            new_ = BigramTrigram(text, 1)
+            new_ = BigramTrigram(text, 1, context)
             db_session.add(new_)
         else:
-            obj.tipo = obj.tipo + 1
+            obj.frequencia = obj.frequencia + 1
     
     db_session.commit()
 

@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 
 config = configparser.ConfigParser()
-config.read("scripts/config.ini")
+config.read("config.ini")
 
 SIDE_A = config['GENERAL']['SIDE_A']
 SIDE_B = config['GENERAL']['SIDE_B']
@@ -45,25 +45,29 @@ def shutdown_session(exception=None):
 
 def load_from_db(limit=10):
 
-    query_usuarios_rt = UsuariosRT.query.order_by(UsuariosRT.frequencia.desc()).limit(limit).all()
-    query_termos = Termos.query.order_by(Termos.frequencia.desc()).limit(limit).all()
-    query_hashtags = Hashtags.query.order_by(Hashtags.frequencia.desc()).limit(limit).all()
-    query_usuarios_citados = UsuariosCitados.query.order_by(UsuariosCitados.frequencia.desc()).limit(limit).all()
+    query_usuarios_rt = UsuariosRT.query.filter(UsuariosRT.context.is_(CONTEXT)).order_by(UsuariosRT.frequencia.desc()).limit(limit).all()
+    query_termos = Termos.query.filter(Termos.context.is_(CONTEXT)).order_by(Termos.frequencia.desc()).limit(limit).all()
+    query_hashtags = Hashtags.query.filter(Hashtags.context.is_(CONTEXT)).order_by(Hashtags.frequencia.desc()).limit(limit).all()
+    query_usuarios_citados = UsuariosCitados.query.filter(UsuariosCitados.context.is_(CONTEXT)).order_by(UsuariosCitados.frequencia.desc()).limit(limit).all()
 
-    query_bigram_trigram = BigramTrigram.query.order_by(BigramTrigram.tipo.desc()).limit(limit).all()
+    query_bigram_trigram = BigramTrigram.query.filter(BigramTrigram.context.is_(CONTEXT)).order_by(BigramTrigram.frequencia.desc()).limit(limit).all()
 
     return query_termos, query_hashtags, query_usuarios_rt, query_usuarios_citados, query_bigram_trigram
 
 @app.route("/")
 def home():
 
-    total_texts = db_session.query(func.count(AllTweets.id).label('total_texts')).first().total_texts
-    total_terms = db_session.query(func.count(Termos.id).label('total_terms')).first().total_terms
-    total_processed = db_session.query(func.count(AllTweets.id).label("total_processed")).filter(AllTweets.processed==1).first().total_processed
+    total_texts = db_session.query(func.count(AllTweets.id).label('total_texts')).filter(AllTweets.context.is_(CONTEXT)).first().total_texts
+
+    if total_texts == 0:
+        return("There is no data for this context: " + CONTEXT)
+
+    total_terms = db_session.query(func.count(Termos.id).label('total_terms')).filter(Termos.context.is_(CONTEXT)).first().total_terms
+    total_processed = db_session.query(func.count(AllTweets.id).label("total_processed")).filter(AllTweets.context.is_(CONTEXT)).filter(AllTweets.processed==1).first().total_processed
     
 
-    date_max = db_session.query(AllTweets.id, func.max(AllTweets.date).label('last_date')).first().last_date
-    date_min = db_session.query(AllTweets.id, func.min(AllTweets.date).label('last_date')).first().last_date
+    date_max = db_session.query(AllTweets.id, func.max(AllTweets.date).label('last_date')).filter(AllTweets.context.is_(CONTEXT)).first().last_date
+    date_min = db_session.query(AllTweets.id, func.min(AllTweets.date).label('last_date')).filter(AllTweets.context.is_(CONTEXT)).first().last_date
 
     termos, hashtags, usuarios_rt, usuarios_citados, bigram_trigram = load_from_db(10)
 
@@ -139,7 +143,7 @@ def graph():
 @app.route("/cloud/")
 def cloud():
 
-    query_termos = Termos.query.order_by(Termos.frequencia.desc()).limit(400).all()
+    query_termos = Termos.query.filter(Termos.context.is_(CONTEXT)).order_by(Termos.frequencia.desc()).limit(400).all()
 
     t = {}
 

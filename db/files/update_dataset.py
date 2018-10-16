@@ -10,22 +10,21 @@
 '''
 
 import csv
-import time
-import sys
 import os
-import pytz
-
-from twython import Twython
-from twython.exceptions import TwythonError, TwythonRateLimitError
-from sqlalchemy.exc import IntegrityError
+import sys
+import time
 from datetime import datetime
 
-parent_dir_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-from db.models import AllTweets
-from db.database import db_session
+import pytz
+from sqlalchemy.exc import IntegrityError
+from twython import Twython
+from twython.exceptions import TwythonError, TwythonRateLimitError
 
+from db.database import db_session
+from db.models import AllTweets
 from scripts.d2l_collector.twitter import Twitter
 
+parent_dir_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 t = Twitter()
 credentials = t.get_credentials()

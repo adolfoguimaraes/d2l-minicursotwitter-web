@@ -1,8 +1,8 @@
 import os
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 # DATABASE URL 
 parent_dir_name = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))

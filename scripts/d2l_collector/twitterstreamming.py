@@ -73,10 +73,10 @@ if __name__ == "__main__":
 
     credentials = twitter.get_credentials()
 
-    consumer_key = credentials['consumer_key'] # Get Keys and Access Token at apps.twitter.com
-    consumer_secret = credentials['consumer_secret'] # Get Keys and Access Token at apps.twitter.com
-    access_token = credentials['access_token'] # Get Keys and Access Token at apps.twitter.com
-    access_token_secret = credentials['access_token_secret'] # Get Keys and Access Token at apps.twitter.com
+    consumer_key = credentials['consumer_key'] 
+    consumer_secret = credentials['consumer_secret'] 
+    access_token = credentials['access_token'] 
+    access_token_secret = credentials['access_token_secret'] 
 
     stream = MyStreamer(consumer_key, consumer_secret, access_token, access_token_secret, twitter)
     stream.set_stringsearch(tag)

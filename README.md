@@ -42,22 +42,17 @@ O projeto web exibe as informações coletadas e processadas. Foi utilizado o **
 entanto, por conta da política de uso da API do Twitter, os tweets devem ser coletados novamente já que não é permitido distribuir
 os tweets coletados.
 
-Para inserir os tweets na base, execute o script `updadte_database.py` no diretório `db/files/`.
+Para inserir os tweets na base, execute: `python -m db.files.update_dataset` na pasta raiz.
 
-Após coletar os tweets é preciso gerar os dados processados. Para isto execute o script `run.py` na pasta `scripts`.
+Após coletar os tweets é preciso gerar os dados processados. Para isto execute: `python -m scritps.run`.
 
 Para executar o servidor web com a página, use: `python flask_app.py` no diretório raiz.
 
-**Para executar os arquivos utilize os seguintes comandos na pasta raiz do projeto:** 
+**Para coletar dados direto do twitter execute: ** 
 
-`python -m db.files.update_dataset`: para coletar os dados e inserir no banco de dados. 
-
-`python -m scripts.run`: para processar os dados e inseri-los processados nas tabelas correspondentes. 
-
-A página a seguir deve ser visualizada:
-
-![screen_capture](http://adolfo.data2learning.com/screen_capture_d2l.png)
-
+`python -m scripts.d2l_collector.twittercollector [query] [context]`
+ou
+`python -m scripts.d2l_collector.twitterstreamming [query] [context]`
 
 Qualquer dúvida e/ou sugestões, entre em contato:
 
