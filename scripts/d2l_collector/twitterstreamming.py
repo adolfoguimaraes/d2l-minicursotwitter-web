@@ -49,7 +49,6 @@ class MyStreamer(TwythonStreamer):
 
     def on_error(self, status_code, data):
         print("Erro to collected streamming " + str(status_code))
-        print(data)
         self.disconnect()
 
 
