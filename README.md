@@ -48,10 +48,12 @@ Após coletar os tweets é preciso gerar os dados processados. Para isto execute
 
 Para executar o servidor web com a página, use: `python flask_app.py` no diretório raiz.
 
-**Para coletar dados direto do twitter execute: ** 
+**Para coletar dados direto do twitter execute:** 
 
 `python -m scripts.d2l_collector.twittercollector [query] [context]`
+
 ou
+
 `python -m scripts.d2l_collector.twitterstreamming [query] [context]`
 
 Qualquer dúvida e/ou sugestões, entre em contato:
