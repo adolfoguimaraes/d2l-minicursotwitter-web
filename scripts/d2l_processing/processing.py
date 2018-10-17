@@ -32,14 +32,45 @@ class Processing():
         new_text = str(text, 'utf-8')
 
         try:
-            tweet = normalize('NFKD', new_text.lower()).encode('ASCII', 'ignore')
+            new_text = normalize('NFKD', new_text.lower()).encode('ASCII', 'ignore')
         except UnicodeEncodeError:
-            tweet = normalize('NFKD', new_text.lower().decode('utf-8')).encode('ASCII', 'ignore')
+            new_text = normalize('NFKD', new_text.lower().decode('utf-8')).encode('ASCII', 'ignore')
 
         if isinstance(new_text, str) == False:
             new_text = new_text.decode('utf-8')
 
         return new_text
+
+    def get_words_simple(self, list_text, list_topics):
+
+        all_tokens = []
+        all_hashtags = []
+
+        for text in list_text:
+            tweet_text = self.encode_text(text).lower()
+            
+            
+            local_patterns = regexp_tokenize(tweet_text, self.pattern)
+            users = regexp_tokenize(tweet_text, self.pattern_user)
+            links = regexp_tokenize(tweet_text, self.pattern_links)
+            hashtags = regexp_tokenize(tweet_text, self.pattern_hashtag)
+            
+            all_hashtags += hashtags
+
+
+            final_tokens = [e for e in local_patterns if e not in links]
+            final_tokens = [e for e in final_tokens if e not in hashtags]
+            final_tokens = [e for e in final_tokens if e not in users]
+
+            all_tokens += final_tokens
+
+        words = [word for word in all_tokens if word not in self.portuguese_stops]
+        final_words = [word for word in words if len(word) >= 3]
+
+        topics = [word for word in final_words if word in list_topics]
+        
+        return final_words, all_hashtags, topics
+
 
     def get_words(self, list_text, side_tuple):
 

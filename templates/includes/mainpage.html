@@ -1,151 +1,217 @@
-<div class="starter-template">
-    <div class="alert alert-primary" style="background-color: #19334d; color: #ffffff; ">
-        <h2>Visualização de dados coletados</h2>
-        <h5>
-            <strong>Contexto:</strong> {{ values['context'] }}
-        </h5>
-        <div>
-            Os dados a seguir mostram a comparação dos termos <strong>{{ values['side_a']|upper }}</strong> e
-            <strong>{{ values['side_b']|upper }}</strong> em relação a quantidade de tweets coletados que citavam tais
-            termos.
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-primary" style="background-color: #19334d; color: #ffffff; ">
+            <h2>Visualização de dados coletados</h2>
+            <h5>
+                <strong>Contexto:</strong> {{ values['context'] }}
+            </h5>
+            <div>
+                <small>
+                    Os dados a seguir mostram a comparação dos termos <strong>{{ values['side_a']|upper }}</strong> e
+                    <strong>{{ values['side_b']|upper }}</strong> em relação a quantidade de tweets coletados que
+                    citavam
+                    tais
+                    termos.
+                </small>
+            </div>
+            <div>
+                <small>Os dados são processados exatamente como coletados. Não é realizado nenhum tipo de ajuste para
+                    favorecer um dos termos selecionados.
+                </small>
+            </div>
+            <br />
         </div>
-        <div>
-            <small>Os dados são processados exatamente como coletados. Não é realizado nenhum tipo de ajuste para
-                favorecer um dos termos selecionados.
-            </small>
-        </div>
-        <br />
     </div>
-    <div class="alert alert-info" style="background-color: #d9e6f2; color: #19334d; ">
-        <h4>Estatística:</h4>
-        
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="alert alert-info" style="background-color: #d9e6f2; color: #19334d; ">
+            <h4>Estatística:</h4>
+
             <div><strong>Total de tweets coletados: </strong> {{ values['total_texts'] }}</div>
             <div><strong>Total de tweets processados: </strong> {{ values['total_processed'] }}</div>
             <div><strong>Total de termos extraídos: </strong> {{ values['total_terms'] }}</div>
             <div><strong>Data do primeiro tweet coletado: </strong> {{ values['date_min']|datetime }}</div>
             <div><strong>Data do último tweet coletado: </strong> {{ values['date_max']|datetime }}</div>
             <div><small>A coleta não foi contínua. São coletados apenas alguns tweets por dia.</small></div>
-        
-    </div>
 
-
-
-
-
-    <div>
-        Distribuição referente a quantidade que cada termo é citado nos textos coletados.
-    </div>
-    <div class="progress">
-        <div class="progress-bar progress-bar-danger progress-bar-striped active" style="width: {{ values['total'][0] }}%; font-size: large;">
-            <strong>{{ values['side_a']|upper }} - {{ values['total'][0]|round }}% </strong>({{
-            values['total_value'][0] }})
-            <span class="sr-only">{{ values['total'][0] }}% A</span>
-        </div>
-        <div class="progress-bar progress-bar-striped active" style="width: {{ values['total'][1] }}%; font-size: large;">
-            <strong>{{ values['side_b']|upper }} - {{ values['total'][1]|round }}% </strong>({{
-            values['total_value'][1] }})
-            <span class="sr-only">{{ values['total'][1] }}% B</span>
         </div>
     </div>
-
-
-    <div>
-        <h2>Word Cloud</h2>
-        <div>Os termos pesquisados foram excluídos da nuvem para melhor visualização dos demais termos.</div>
-        <br />
-    </div>
-    <div class="col-xs-12">
-        <div id="loading"></div>
-        <section id="cloud"></section>
-    </div>
-
-    <br />
-
-    <div>
-        <h2>Bigram/Trigram</h2>
-        <div>Associação mais frequentes dos termos 2 a 2 (bigram) e 3 a 3 (trigram).</div>
-    </div>
-
-    <br />
-
-    <div class="col-xs-12" style="text-align: center;">
-        <div style="font-size: 22px;">
-
-            {% for bt in values['bigram_trigram'] %}
-            <span style="padding: 5px; background-color: #cccccc; color:#19334d; ">{{ bt.text }}</span>
-            {% if loop.index % 4 == 0 %}
-            <br /><br />
-            {% endif %}
-
-            {% endfor %}
+    <div class="col-md-6">
+        <div class="alert alert-info" style="background-color: #d9e6f2; color: #19334d; ">
+            <h4>Análise de Perfis:</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card text-white bg-danger mb-3" style="max-width: 18rem;">
+                        <div class="card-header small">
+                            <img src="{{ values['dict_profile']['A']['photo'] }}" alt="{{ values['profile_a' ]}}" class="img-thumbnail rounded float-right">
+                            <strong>{{ values['dict_profile']['A']['name'] }}</strong><br />
+                            @{{ values['profile_a'] }}
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="col-md-6">
+                        <div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
+                            <div class="card-header small">
+                                <img src="{{ values['dict_profile']['B']['photo'] }}" alt="{{ values['profile_b' ]}}" class="img-thumbnail rounded float-right">
+                                <strong>{{ values['dict_profile']['B']['name'] }}</strong><br />
+                                @{{ values['profile_b' ]}}
+                            </div>
+                            
+                        </div>
+                    </div>
+            </div>
+            <div style="text-align: center;">
+                <br />
+                    <a href="/profile">Clique a seguir para ver a análise dos últimos tweets dos dois perfis</a>
+            </div>
+            
         </div>
-        <br /><br />
     </div>
-
-    <div>
-        <h2>Termos e Usuários Frequentes<br /></h2>
-        <div><strong>Top Hashtags:</strong> hashtags mais citadas nos textos.</div>
-        <div><strong>Usuários re-tweetados:</strong> os usuários que tiveram seus textos mais re-tweetados nos textos
-            coletados.</div>
-        <div><strong>Usuários mais citados:</strong> usuários mais citados nos textos coletados.</div>
-
-    </div>
-    <br />
-
-    <div class="col-xs-4">
-        <ul class="list-group">
-            <li class="list-group-item active">
-                Top 10 Hashtags
-            </li>
-            {% for hashtag in values['hashtags'] %}
-
-            <li class="list-group-item">
-                <span class="badge">{{ hashtag.frequencia }}</span>
-                {{ hashtag.hashtag }}
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="col-xs-4">
-        <ul class="list-group">
-            <li class="list-group-item active">
-                Top 10 Usuários Mais Re-Tweetados
-            </li>
-            {% for usuario in values['usuarios_rt'] %}
-
-            <li class="list-group-item">
-                <span class="badge">{{ usuario.frequencia }}</span>
-                @{{ usuario.usuario }}
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="col-xs-4">
-        <ul class="list-group">
-            <li class="list-group-item active">
-                Top 10 Usuários Mais Citados
-            </li>
-            {% for usuario in values['usuarios_citados'] %}
-
-            <li class="list-group-item">
-                <span class="badge">{{ usuario.frequencia }}</span>
-                {{ usuario.usuario }}
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div>
-        <h2>Gráfico de evolução</h2>
-        <div>Evolução da citação dos termos ao longo do tempo de coleta.</div>
-    </div>
-
-    <div class="col-xs-12" align="center">
-        <section id="graph"></section>
-    </div>
-
 </div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div>
+            Distribuição referente a quantidade que cada termo é citado nos textos coletados.
+        </div>
+        <div class="progress" style="height:40px">
+            <div class="progress-bar bg-danger progress-bar-striped active progress-bar-animated" role="progressbar"
+                style="width: {{ values['total'][0] }}%; font-size: large; height:40px;">
+                <span>
+                    <strong>{{ values['side_a']|upper }} - {{ values['total'][0]|round }}% </strong>({{values['total_value'][0]
+                    }})
+                </span>
+            </div>
+            <div class="progress-bar progress-bar-striped active progress-bar-animated" role="progressbar" style="width: {{ values['total'][1] }}%; font-size: large; height:40px;">
+                <span>
+                    <strong>{{ values['side_b']|upper }} - {{ values['total'][1]|round }}% </strong>({{values['total_value'][1]
+                    }})
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <div>
+            <h2>Word Cloud</h2>
+            <div>Os termos pesquisados foram excluídos da nuvem para melhor visualização dos demais termos.</div>
+            <br />
+        </div>
+        <div class="col-xs-12" style="text-align: center;">
+            <div id="loading"></div>
+            <section id="cloud"></section>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div>
+            <h2>Bigram/Trigram</h2>
+            <div>Associação mais frequentes dos termos 2 a 2 (bigram) e 3 a 3 (trigram).</div>
+        </div>
+
+        <br />
+
+        <div class="col-xs-12" style="text-align: center;">
+            <div style="font-size: 22px;">
+
+                {% for bt in values['bigram_trigram'] %}
+                <span style="padding: 5px; background-color: #cccccc; color:#19334d; ">{{ bt.text }}</span>
+                {% if loop.index % 4 == 0 %}
+                <br /><br />
+                {% endif %}
+
+                {% endfor %}
+            </div>
+            <br /><br />
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row">
+            <div>
+                <h2>Termos e Usuários Frequentes<br /></h2>
+                <div><strong>Top Hashtags:</strong> hashtags mais citadas nos textos.</div>
+                <div><strong>Usuários re-tweetados:</strong> os usuários que tiveram seus textos mais re-tweetados nos
+                    textos coletados.</div>
+                <div><strong>Usuários mais citados:</strong> usuários mais citados nos textos coletados.</div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-4">
+                <ul class="list-group">
+                    <li class="list-group-item active" style="background-color: #19334d; color: #ffffff; ">
+                        Top 10 Hashtags
+                    </li>
+                    {% for hashtag in values['hashtags'] %}
+
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                        {{ hashtag.hashtag }}
+                        <span class="badge badge-dark badge-pill">{{ hashtag.frequencia }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="col-md-4">
+                <ul class="list-group">
+                    <li class="list-group-item active" style="background-color: #19334d; color: #ffffff; ">
+                        Top 10 Usuários Mais Re-Tweetados
+                    </li>
+                    {% for usuario in values['usuarios_rt'] %}
+
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                        @{{ usuario.usuario }}
+                        <span class="badge badge-dark badge-pill">{{ usuario.frequencia }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="col-md-4">
+                <ul class="list-group">
+                    <li class="list-group-item active" style="background-color: #19334d; color: #ffffff; ">
+                        Top 10 Usuários Mais Citados
+                    </li>
+                    {% for usuario in values['usuarios_citados'] %}
+
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+
+                        {{ usuario.usuario }}
+                        <span class="badge badge-dark badge-pill">{{ usuario.frequencia }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-md-12">
+        <div>
+            <h2>Gráfico de evolução</h2>
+            <div>Evolução da citação dos termos ao longo do tempo de coleta.</div>
+        </div>
+
+
+        <div class="col-xs-12" align="center">
+            <section id="graph"></section>
+        </div>
+    </div>
+</div>
+
+
 
 <div align="center"><small>Desenvolvido por <a href="http://www.twitter.com/data2learning" target="_blank">@data2learning</a></small></div>

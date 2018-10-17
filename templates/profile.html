@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  {% include "includes/head.html" %}
+
+</head>
+
+<body>
+
+  <!-- Page Content -->
+  <div class="container">
+
+
+    <!-- Content Row -->
+    <div class="row">
+      <div class="col-md-12">
+        <div id="msg" name="msg"></div>
+      </div>  
+    </div>
+    <div class="row" name="profile_information" id="profile_information" style="display:none;">
+      <div class="col-md-12" style="text-align: center;">
+          
+              <small><strong>Atenção: </strong>O perfil é baseado nas últimas 200 postagens da timeline do usuário analisado.
+                A nuvem de tags possui os 250 termos mais relevantes e as hashtags representam as 3 mais citadas nas postagens.
+              <strong>Todas as informações foram extraídas do perfil público analisado.</strong></small>
+          
+      </div>
+      <div class="col-md-12"><br></div>
+      <div class="col-md-6 mb-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <div id="image_a" name="image_a"></div>
+            <div id="name_a" name="name_a"></div>
+            <div id="description_a" name="description_a"></div>
+            <div id="hashtag_a" name="hashtag_a"></div>
+          </div>
+            <div class="card-body">
+                <div class="col-xs-12" style="text-align: center;">
+                    <div id="loading_a"></div>
+                    <section id="cloud_a"></section>
+                </div>
+
+            </div>
+            <div class="card-body">
+                <div id="terms_list_a" name="terms_list_a"></div>
+            </div>
+        </div>
+      </div>
+      <!-- /.col-md-4 -->
+      <div class="col-md-6 mb-6">
+        <div class="card h-100">
+          <div class="card-header card-header-danger">
+              <div id="image_b" name="image_b"></div>
+              <div id="name_b" name="name_b"></div>
+              <div id="description_b" name="description_b"></div>
+              <div id="hashtag_b" name="hashtag_b"></div>
+          </div>
+          <div class="card-body">
+              <div class="col-xs-12" style="text-align: center;">
+                  <div id="loading_b"></div>
+                  <section id="cloud_b"></section>
+              </div>
+          </div>
+          <div class="card-body">
+              
+              <div id="terms_list_b" name="terms_list_b"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <br>
+        <div style="text-align: center;">
+            <a href="/">Clique aqui para voltar à página principal.</a>
+          </div>
+      </div>
+
+    </div>
+    <!-- /.row -->
+    
+  </div>
+  <!-- /.container -->
+
+  {% include "includes/botton.html" %}
+
+  <script>
+  
+
+  
+  </script>
+
+<!-- 
+  <script src="{{ url_for('static', filename='js/wordcloud/d3.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/wordcloud/d3.layout.cloud.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/wordcloud/app_small.js') }}"></script>
+-->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+
+<script src="{{ url_for('static', filename='js/wordcloud/d3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/wordcloud/d3.layout.cloud.js') }}"></script>
+<script src="{{ url_for('static', filename='js/wordcloud/profile.js') }}"></script>
+
+
+</body>
+
+</html>

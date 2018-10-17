@@ -6,12 +6,21 @@ import pytz
 import datetime
 import calendar
 import configparser
+import operator
+
+from collections import Counter
 
 from sqlalchemy import and_
 
+from scripts.d2l_collector.twitter import Twitter
+
+from scripts.d2l_processing.processing import Processing
+
+from twython import Twython
+
 app = Flask(__name__)
  
-
+TEMPLATES_AUTO_RELOAD = True
 config = configparser.ConfigParser()
 config.read("config.ini")
 
@@ -19,6 +28,11 @@ SIDE_A = config['GENERAL']['SIDE_A']
 SIDE_B = config['GENERAL']['SIDE_B']
 CONTEXT = config['GENERAL']['CONTEXT']
 HASHTAG = config['GENERAL']['HASHTAG']
+
+PROFILE_A = config['PROFILES']['PROFILE_A']
+PROFILE_B = config['PROFILES']['PROFILE_B']
+TOPICS = config['PROFILES']['TOPICS']
+
 
 def change_fuso(value):
 
@@ -95,6 +109,11 @@ def home():
         percent_a = (total_a / total) * 100
         percent_b = (total_b / total) * 100
 
+    
+    profiles_info = get_profile()
+
+    
+
     dict_values = {
         'total_texts': total_texts,
         'total_terms': total_terms,
@@ -110,12 +129,46 @@ def home():
         'total': (percent_a, percent_b),
         'total_value': (int(total_a), int(total_b)),
         'bigram_trigram': bigram_trigram,
-        'context': CONTEXT
+        'context': CONTEXT,
+        'profile_a': PROFILE_A,
+        'profile_b': PROFILE_B,
+        'dict_profile': profiles_info
 
     }
 
 
     return render_template("index.html",values=dict_values)
+
+def get_profile():
+
+    
+
+    twitter = Twitter()
+    credentials = twitter.get_credentials()
+    tw = Twython(credentials['consumer_key'], credentials['consumer_secret'], credentials['access_token'], credentials['access_token_secret'])
+
+    tw_user_a = tw.show_user(screen_name=PROFILE_A)
+    tw_user_b = tw.show_user(screen_name=PROFILE_B)
+
+    user_a = {
+        'name': tw_user_a['name'],
+        'description': tw_user_a['description'],
+        'photo': tw_user_a['profile_image_url']
+    }
+
+    user_b = {
+        'name': tw_user_b['name'],
+        'description': tw_user_b['description'],
+        'photo': tw_user_b['profile_image_url']
+    }
+
+    dict_ = {
+        'A': user_a,
+        'B': user_b
+    }
+
+    
+    return dict_
 
 
 @app.route("/graph/")
@@ -141,6 +194,97 @@ def graph():
 
     return jsonify(**{'list': all_})
 
+@app.route("/profile_temp")
+def profile_temp():
+
+    args = {}
+
+    return render_template("out.html",values=args)
+
+
+@app.route("/profile")
+def profile():
+    
+
+    return render_template("profile.html")    
+
+
+@app.route("/profile_information", methods=['POST'])
+def profile_information():
+
+    list_topics = TOPICS.replace(" ", "").split(",")
+    
+
+    processing = Processing()
+
+    twitter = Twitter()
+    credentials = twitter.get_credentials()
+    tw = Twython(credentials['consumer_key'], credentials['consumer_secret'], credentials['access_token'], credentials['access_token_secret'])
+
+
+
+    tw_user_a = tw.show_user(screen_name=PROFILE_A)
+    tw_user_b = tw.show_user(screen_name=PROFILE_B)
+
+    user_a = {
+        'name': tw_user_a['name'],
+        'description': tw_user_a['description'],
+        'photo': tw_user_a['profile_image_url']
+    }
+
+    user_b = {
+        'name': tw_user_b['name'],
+        'description': tw_user_b['description'],
+        'photo': tw_user_b['profile_image_url']
+    }
+
+    timeline_a = tw.get_user_timeline(screen_name=PROFILE_A, count=200)
+    timeline_b = tw.get_user_timeline(screen_name=PROFILE_B, count=200)
+
+    args = {}
+
+    all_texts_a = []
+    all_texts_b = []
+
+    for tweet in timeline_a:
+        tweet_data = twitter.get_tweet_data(tweet)
+        all_texts_a.append(tweet_data['text'])
+
+    for tweet in timeline_b:
+        tweet_data = twitter.get_tweet_data(tweet)
+        all_texts_b.append(tweet_data['text'])
+
+    words_a, hashtags_a, topics_a = processing.get_words_simple(all_texts_a, list_topics)
+    words_b, hashtags_b, topics_b = processing.get_words_simple(all_texts_b, list_topics)
+
+    
+    temp_a = dict(Counter(words_a).most_common(250))
+    temp_b = dict(Counter(words_b).most_common(250))
+    sorted_a = dict(sorted(temp_a.items(), key=operator.itemgetter(1), reverse=True))
+    sorted_b = dict(sorted(temp_b.items(), key=operator.itemgetter(1), reverse=True))
+
+    top_10_a = [word for word in sorted_a][:10]
+    top_10_b = [word for word in sorted_b][:10]
+
+    user_a['top_10'] = top_10_a
+    user_b['top_10'] = top_10_b
+
+    user_a['words'] = sorted_a
+    user_b['words'] = sorted_b
+
+    user_a['hashtags'] = Counter(hashtags_a).most_common(3)
+    user_b['hashtags'] = Counter(hashtags_b).most_common(3)
+
+    user_a['topics'] = dict(Counter(topics_a))
+    user_b['topics'] = dict(Counter(topics_b))
+
+    args = {
+        'user_a': user_a,
+        'user_b': user_b,
+        'topics_name': list_topics
+    }
+
+    return jsonify(args)
 
 @app.route("/cloud/")
 def cloud():
@@ -157,5 +301,5 @@ def cloud():
 
 
 if __name__ == "__main__":
-    app.debug = True
-    app.run()
+    
+    app.run(debug=True)
